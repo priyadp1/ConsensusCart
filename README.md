@@ -2,6 +2,8 @@
 
 **Three AI shopping agents debate until they agree, then you check out with PayPal.**
 
+**▶ Live demo: https://consensuscart.streamlit.app/**. Pay with a PayPal **Sandbox** buyer account (no real money).
+
 Shopping assistants usually optimize one thing. ConsensusCart gives the decision to three agents with
 competing priorities and makes them reach consensus in the open:
 
@@ -15,6 +17,16 @@ Each agent picks independently first. If they disagree, every agent sees the oth
 reconsiders, for up to two deliberation rounds. Agents are told not to give in just because they're
 outvoted, and to challenge claims the product data doesn't support. The winning product goes
 straight to a PayPal Sandbox checkout.
+
+## Tools used
+
+| Tool | How ConsensusCart uses it |
+|---|---|
+| **PayPal Orders v2 REST API (Sandbox)** | Checkout. The app creates an order for the consensus product (price taken from the server-side catalog), sends the buyer to PayPal to approve it, then captures the payment when PayPal redirects back and shows a receipt. Capture is idempotent through `PayPal-Request-Id`. See [payments/paypal.py](payments/paypal.py). |
+| **OpenAI `gpt-4.1-mini`** | The model behind all three agents. Each agent returns structured output (product ID, confidence, reasoning, trade-offs), and during deliberation it also returns its response to the other agents' arguments. |
+| **LangChain** | Prompt templates and `with_structured_output` to get validated Pydantic objects from the model. |
+| **LangGraph** | Orchestrates the multi-agent workflow: a parallel fan-out to the three agents, vote aggregation, and a conditional deliberation loop that runs until the agents agree unanimously or reach the round limit. |
+| **Streamlit / Streamlit Community Cloud** | The web UI (live agent progress, consensus view, checkout, receipt) and hosting. |
 
 ## How it works
 
@@ -96,7 +108,7 @@ All tests use scripted fake models, so they need no API keys and make no network
    OPENAI_API_KEY = "sk-..."
    PAYPAL_CLIENT_ID = "..."
    PAYPAL_CLIENT_SECRET = "..."
-   APP_URL = "https://<your-app>.streamlit.app"
+   APP_URL = "https://consensuscart.streamlit.app"
    ```
 
 ## Project layout
@@ -117,3 +129,7 @@ tests/                     pytest suite (no keys needed)
   deployment would plug in a product search API.
 - Checkout uses the PayPal **Sandbox**, and no real money moves.
 - Each search makes 3–9 LLM calls (3 independent picks plus up to 2 rounds of 3 deliberations).
+
+## License
+
+[MIT](LICENSE)
