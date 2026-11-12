@@ -22,7 +22,7 @@ def load_streamlit_secrets():
 load_streamlit_secrets()
 
 from agents.orchestrator import consensus_graph  # noqa: E402  (needs the .env loaded first)
-from data.catalog import categories, get_product, load_products  # noqa: E402
+from data.catalog import categories, get_product, load_offers, load_products  # noqa: E402
 from payments import paypal  # noqa: E402
 
 APP_URL = os.getenv("APP_URL", "http://localhost:8501").rstrip("/")
@@ -31,6 +31,7 @@ AGENT_LABELS = {
     "budget": "💰 Budget Agent",
     "quality": "⭐ Quality Agent",
     "trust": "🛡️ Trust Agent",
+    "deals": "🏷️ Deals Agent",
 }
 
 EXAMPLE_QUERIES = {
@@ -62,6 +63,35 @@ def describe_update(node, update):
     if node == "finalize":
         return "✅ Consensus finalized"
     return None
+
+
+def money(value, missing="Not stated"):
+    return missing if value is None else f"${value:,.2f}"
+
+
+def render_offers(product):
+    offers = load_offers(product["product_id"])
+    if not offers:
+        return
+    st.markdown("**🏷️ Prices across sellers**")
+    rows = [
+        {
+            "Seller": offer["seller"],
+            "Seller rating": offer["seller_rating"],
+            "Condition": offer["condition"],
+            "Price": money(offer["price"]),
+            "Discount": f"{offer['discount_percent']:.0f}%" if offer["discount_percent"] else "—",
+            "Sale price": money(offer["sale_price"]),
+            "Shipping": "Free" if offer["shipping_cost"] == 0 else money(offer["shipping_cost"]),
+            "Delivery": f"{offer['delivery_days']} days" if offer["delivery_days"] else "Not stated",
+            "Total cost": money(offer["total_cost"], missing="Unknown"),
+        }
+        for offer in offers
+    ]
+    st.dataframe(pd.DataFrame(rows), hide_index=True)
+    st.caption(
+        f"Totals exclude sales tax. Checkout below is with {product['seller']} at ${product['price']:.2f}."
+    )
 
 
 def run_consensus(state):
@@ -111,7 +141,7 @@ def render_receipt(receipt):
                "Payer email": receipt.get("payer_email")}
     st.caption(" · ".join(f"{k}: {v}" for k, v in details.items() if v))
     if st.button("Start a new search"):
-        for key in ("receipt", "result", "order"):
+        for key in ("receipt", "result", "order", "choice"):
             st.session_state.pop(key, None)
         st.rerun()
 
@@ -144,10 +174,11 @@ def render_consensus(result):
                 f"**{AGENT_LABELS[dissent['agent']]} dissents** and still prefers "
                 f"{product_label(dissent['product_id'], products)}: {dissent['reasoning']}"
             )
+        render_offers(product)
 
     st.subheader("🤖 Agent Recommendations")
     first_round = result["rounds"][0]["recommendations"]
-    for agent, column in zip(AGENT_LABELS, st.columns(3)):
+    for agent, column in zip(AGENT_LABELS, st.columns(len(AGENT_LABELS))):
         recommendation = result[f"{agent}_recommendation"]
         with column, st.container(border=True):
             st.markdown(f"**{AGENT_LABELS[agent]}**")
@@ -180,6 +211,34 @@ def render_consensus(result):
         st.caption("The agents hit the deliberation round limit without full agreement; the majority pick wins.")
 
 
+def choose_product(result):
+    """The consensus is a recommendation: the buyer can pick any other product the agents considered."""
+    consensus = result["consensus"]
+    products = result["eligible_products"]
+    product_ids = [p["product_id"] for p in products]
+
+    st.subheader("🛍️ Your Choice")
+    choice = st.selectbox(
+        "Buy the consensus pick, or override it with another product within your budget",
+        product_ids,
+        index=product_ids.index(consensus["product_id"]),
+        format_func=lambda pid: ("🏆 " if pid == consensus["product_id"] else "") + product_label(pid, products),
+        key="choice",
+    )
+    product = next(p for p in products if p["product_id"] == choice)
+    if choice == consensus["product_id"]:
+        return product
+
+    backers = [AGENT_LABELS[a] for a in AGENT_LABELS if result[f"{a}_recommendation"]["product_id"] == choice]
+    support = f"Backed by {', '.join(backers)}." if backers else "None of the agents picked this product."
+    st.info(
+        f"**You're overriding the agents' consensus** ({product_label(consensus['product_id'], products)}) "
+        f"with **{product['name']}**, ${product['price']:.2f} from {product['seller']}. {support}"
+    )
+    render_offers(product)
+    return product
+
+
 def render_checkout(product):
     st.subheader("💳 Checkout")
     if not paypal.is_configured():
@@ -206,7 +265,7 @@ def render_checkout(product):
 
 
 st.title("🛒 ConsensusCart")
-st.caption("Three AI shopping agents debate until they agree, then you check out with PayPal.")
+st.caption("Four AI shopping agents debate until they agree, then you check out with PayPal.")
 
 handle_paypal_return()
 if notice := st.session_state.pop("checkout_notice", None):
@@ -231,7 +290,8 @@ search = {
 }
 
 if submitted:
-    st.session_state.pop("order", None)
+    for key in ("order", "choice"):  # a new search starts from the new consensus pick
+        st.session_state.pop(key, None)
     if not os.getenv("OPENAI_API_KEY"):
         st.error("OPENAI_API_KEY is not set. Add it to your environment or a .env file.")
         st.stop()
@@ -256,4 +316,4 @@ if result and result["search"] != search:
 elif result:
     st.caption(f"Results for “{search['query']}” in {search['category']}, up to ${search['budget']:,.0f}")
     render_consensus(result)
-    render_checkout(result["consensus"]["product"])
+    render_checkout(choose_product(result))

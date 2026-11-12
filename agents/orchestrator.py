@@ -1,5 +1,6 @@
 from langgraph.graph import END, START, StateGraph
 from agents.budget_agent import run_budget_agent
+from agents.deals_agent import run_deals_agent
 from agents.quality_agent import run_quality_agent
 from agents.state import ConsensusState
 from agents.trust_agent import run_trust_agent
@@ -23,6 +24,7 @@ graph.add_node("filter_budget", filter_by_budget)
 graph.add_node("budget", run_budget_agent)
 graph.add_node("quality", run_quality_agent)
 graph.add_node("trust", run_trust_agent)
+graph.add_node("deals", run_deals_agent)
 
 graph.add_node("aggregate", aggregate)
 graph.add_node("finalize", finalize)
@@ -31,12 +33,12 @@ for agent in AGENTS:
 
 graph.add_edge(START, "filter_budget")
 
-# Round 0: independent evaluations in parallel, then aggregate once all three finish
+# Round 0: independent evaluations in parallel, then aggregate once all four finish
 for agent in AGENTS:
     graph.add_edge("filter_budget", agent)
 graph.add_edge(list(AGENTS), "aggregate")
 
-# Deliberation loop: aggregate -> (all three agents reconsider) -> aggregate ... -> finalize
+# Deliberation loop: aggregate -> (all four agents reconsider) -> aggregate ... -> finalize
 deliberation_nodes = [f"deliberate_{agent}" for agent in AGENTS]
 graph.add_conditional_edges("aggregate", route_after_aggregate, deliberation_nodes + ["finalize"])
 graph.add_edge(deliberation_nodes, "aggregate")

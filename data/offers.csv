@@ -1,0 +1,45 @@
+product_id,seller,seller_rating,price,discount_percent,shipping_cost,delivery_days,condition
+HP-01,Auralis Official Store,4.9,299.00,0,0.00,3,New
+HP-01,SoundHub Outlet,4.4,299.00,15,9.99,5,New
+HP-01,DealZone Marketplace,3.6,279.00,25,,10,New
+HP-02,SoundHub Outlet,4.4,149.00,0,0.00,4,New
+HP-02,Tempo Store,4.7,159.00,10,5.99,3,New
+HP-02,ReCircuit Refurbished,4.2,119.00,0,0.00,6,Refurbished
+HP-03,Brightline Direct,4.6,89.00,0,0.00,5,New
+HP-03,MegaMart Online,4.5,89.00,10,0.00,2,New
+HP-04,Nordvik,4.8,189.00,0,0.00,3,New
+HP-04,SoundHub Outlet,4.4,199.00,10,12.50,6,New
+HP-04,MegaMart Online,4.5,189.00,5,0.00,2,New
+HP-05,DealZone Marketplace,3.6,179.00,0,0.00,12,New
+HP-05,EchoLab Store,4.3,179.00,20,0.00,4,New
+HP-06,Pulse Audio,4.5,59.00,0,0.00,4,New
+HP-06,MegaMart Online,4.5,59.00,0,0.00,2,New
+HP-06,ReCircuit Refurbished,4.2,39.00,0,3.99,6,Refurbished
+LT-01,Kestrel Store,4.8,899.00,0,0.00,3,New
+LT-01,CampusTech,4.6,899.00,10,0.00,5,New
+LT-01,ReCircuit Refurbished,4.2,749.00,0,0.00,6,Refurbished
+LT-02,Vantage Direct,4.7,1599.00,0,0.00,4,New
+LT-02,MegaMart Online,4.5,1599.00,8,0.00,3,New
+LT-03,Lumen Official,4.5,399.00,0,0.00,5,New
+LT-03,MegaMart Online,4.5,399.00,15,0.00,2,New
+LT-03,CampusTech,4.6,379.00,0,9.99,5,New
+LT-04,TechBargains Marketplace,3.4,1249.00,0,0.00,14,New
+LT-04,Orbit Store,4.4,1249.00,12,0.00,4,New
+LT-05,Kestrel Store,4.8,649.00,0,0.00,3,New
+LT-05,CampusTech,4.6,649.00,12,0.00,5,New
+LT-05,TechBargains Marketplace,3.4,599.00,5,,14,New
+LT-06,Ironclad Business,4.9,1099.00,0,0.00,5,New
+LT-06,ReCircuit Refurbished,4.2,899.00,0,0.00,6,Refurbished
+CM-01,Barista Co Official,4.8,449.00,0,0.00,4,New
+CM-01,HomeGoods Direct,4.6,449.00,15,19.99,6,New
+CM-02,HomeGoods Direct,4.6,79.00,0,0.00,5,New
+CM-02,MegaMart Online,4.5,74.00,0,6.99,2,New
+CM-03,PourCraft,4.7,159.00,0,0.00,4,New
+CM-03,HomeGoods Direct,4.6,159.00,20,8.99,5,New
+CM-04,Moka Home,4.2,249.00,0,0.00,5,New
+CM-04,MegaMart Online,4.5,249.00,10,0.00,2,New
+CM-04,ReCircuit Refurbished,4.2,169.00,0,9.99,6,Refurbished
+CM-05,Cafe Express Store,4.7,119.00,0,0.00,3,New
+CM-05,MegaMart Online,4.5,119.00,25,0.00,2,New
+CM-06,ImportDirect Marketplace,3.8,699.00,0,0.00,21,New
+CM-06,Artisan Store,4.6,749.00,0,0.00,7,New

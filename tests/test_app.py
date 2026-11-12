@@ -30,18 +30,22 @@ def page_text(at):
 
 
 def test_search_runs_the_real_graph_and_shows_consensus(scripted):
-    scripted({"budget": ["HP-03"], "quality": ["HP-04"], "trust": ["HP-04"]})
+    scripted({"budget": ["HP-03"], "quality": ["HP-04"], "trust": ["HP-04"], "deals": ["HP-04"]})
     at = search()
     assert not at.exception
     text = page_text(at)
     assert "Nordvik Quiet 700" in text                   # consensus pick
     assert "Budget Agent dissents" in text               # persistent dissent is surfaced
-    assert at.metric[0].value == "67%"
+    assert at.metric[0].value == "75%"
+    assert "Prices across sellers" in text
+    offers = at.dataframe[0].value
+    assert list(offers["Seller"]) == ["MegaMart Online", "Nordvik", "SoundHub Outlet"]  # cheapest total first
+    assert list(offers["Total cost"]) == ["$179.55", "$189.00", "$191.60"]
     assert "PayPal checkout is disabled" in at.info[0].value
 
 
 def test_agent_that_changes_its_mind_is_flagged(scripted):
-    scripted({"budget": ["HP-03", "HP-04"], "quality": ["HP-04"], "trust": ["HP-04"]})
+    scripted({"budget": ["HP-03", "HP-04"], "quality": ["HP-04"], "trust": ["HP-04"], "deals": ["HP-04"]})
     at = search()
     assert not at.exception
     assert "Changed its mind" in page_text(at)
@@ -49,7 +53,7 @@ def test_agent_that_changes_its_mind_is_flagged(scripted):
 
 
 def test_changing_the_search_hides_old_results(scripted):
-    scripted({"budget": ["HP-04"], "quality": ["HP-04"], "trust": ["HP-04"]})
+    scripted({"budget": ["HP-04"], "quality": ["HP-04"], "trust": ["HP-04"], "deals": ["HP-04"]})
     at = search()
     assert "Nordvik Quiet 700" in page_text(at)
     at.selectbox[0].set_value("Coffee Makers")
@@ -60,14 +64,14 @@ def test_changing_the_search_hides_old_results(scripted):
 
 
 def test_no_products_in_budget_shows_error(scripted):
-    scripted({"budget": ["HP-06"], "quality": ["HP-06"], "trust": ["HP-06"]})
+    scripted({"budget": ["HP-06"], "quality": ["HP-06"], "trust": ["HP-06"], "deals": ["HP-06"]})
     at = search(budget=10)
     assert not at.exception
     assert "No products within budget" in at.error[0].value
 
 
 def test_checkout_creates_paypal_order(scripted, monkeypatch):
-    scripted({"budget": ["HP-04"], "quality": ["HP-04"], "trust": ["HP-04"]})
+    scripted({"budget": ["HP-04"], "quality": ["HP-04"], "trust": ["HP-04"], "deals": ["HP-04"]})
     monkeypatch.setenv("PAYPAL_CLIENT_ID", "client")
     monkeypatch.setenv("PAYPAL_CLIENT_SECRET", "secret")
     created = []
@@ -83,6 +87,50 @@ def test_checkout_creates_paypal_order(scripted, monkeypatch):
     assert not at.exception
     assert created == ["HP-04"]
     assert "ORDER123" in page_text(at)
+
+
+def test_buyer_can_override_the_consensus_and_check_out_their_own_pick(scripted, monkeypatch):
+    scripted({"budget": ["HP-03"], "quality": ["HP-04"], "trust": ["HP-04"], "deals": ["HP-04"]})
+    monkeypatch.setenv("PAYPAL_CLIENT_ID", "client")
+    monkeypatch.setenv("PAYPAL_CLIENT_SECRET", "secret")
+    created = []
+
+    def create_order(product, return_url, cancel_url):
+        created.append((product["product_id"], product["price"]))
+        return {"id": "ORDER123", "status": "PAYER_ACTION_REQUIRED", "approve_url": "https://paypal/approve"}
+
+    monkeypatch.setattr(paypal, "create_order", create_order)
+    at = search()
+    choice = at.selectbox(key="choice")
+    assert choice.value == "HP-04"                       # defaults to the consensus pick
+    assert not any("overriding" in str(i.value) for i in at.info)
+
+    choice.set_value("HP-03").run()
+    assert not at.exception
+    override = next(str(i.value) for i in at.info if "overriding" in str(i.value))
+    assert "Brightline Commute" in override
+    assert "Backed by 💰 Budget Agent" in override
+    buy = next(b for b in at.button if b.label.startswith("Buy with PayPal"))
+    assert "$89.00" in buy.label
+    buy.click().run()
+    assert created == [("HP-03", 89.0)]                  # price still comes from the server-side catalog
+
+
+def test_override_without_agent_support_is_flagged(scripted):
+    scripted({"budget": ["HP-04"], "quality": ["HP-04"], "trust": ["HP-04"], "deals": ["HP-04"]})
+    at = search()
+    at.selectbox(key="choice").set_value("HP-06").run()
+    assert not at.exception
+    assert any("None of the agents picked this product" in str(i.value) for i in at.info)
+
+
+def test_new_search_resets_the_override(scripted):
+    scripted({"budget": ["HP-04"], "quality": ["HP-04"], "trust": ["HP-04"], "deals": ["HP-04"]})
+    at = search()
+    at.selectbox(key="choice").set_value("HP-06").run()
+    at.button[0].click().run()
+    assert not at.exception
+    assert at.selectbox(key="choice").value == "HP-04"
 
 
 def test_paypal_return_captures_and_shows_receipt(monkeypatch):

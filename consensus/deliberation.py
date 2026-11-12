@@ -2,10 +2,12 @@ import json
 from langchain_core.prompts import ChatPromptTemplate
 from agents.budget_agent import BUDGET_SYSTEM_PROMPT
 from agents.common import format_products, get_model, validate_recommendation
+from agents.deals_agent import DEALS_SYSTEM_PROMPT
 from agents.quality_agent import QUALITY_SYSTEM_PROMPT
 from agents.schema import DeliberationResponse
 from agents.trust_agent import TRUST_SYSTEM_PROMPT
 from consensus.aggregation import AGENTS, collect_recommendations
+from data.catalog import with_offers
 
 MAX_DELIBERATION_ROUNDS = 2
 
@@ -13,6 +15,7 @@ SYSTEM_PROMPTS = {
     "budget": BUDGET_SYSTEM_PROMPT,
     "quality": QUALITY_SYSTEM_PROMPT,
     "trust": TRUST_SYSTEM_PROMPT,
+    "deals": DEALS_SYSTEM_PROMPT,
 }
 
 DELIBERATION_INSTRUCTIONS = """
@@ -63,7 +66,8 @@ def make_deliberation_node(agent):
             "query": state["query"],
             "budget": state["budget"],
             "preferences": state.get("preferences") or "None stated",
-            "product_details": format_products(products),
+            # Every agent sees the seller offers here, so the Deals Agent's claims can be checked
+            "product_details": format_products(with_offers(products)),
             "own_recommendation": json.dumps(recommendations[agent], indent=2),
             "other_recommendations": json.dumps(others, indent=2),
         })

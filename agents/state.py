@@ -17,6 +17,7 @@ class ConsensusState(TypedDict, total=False):
     budget_recommendation: dict
     quality_recommendation: dict
     trust_recommendation: dict
+    deals_recommendation: dict
 
     # One entry per round, appended by the aggregate node (round 0 = independent)
     rounds: Annotated[list[dict], operator.add]

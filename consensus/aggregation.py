@@ -6,7 +6,7 @@ from consensus.metrics import (
     is_unanimous,
 )
 
-AGENTS = ("budget", "quality", "trust")
+AGENTS = ("budget", "quality", "trust", "deals")
 
 
 def collect_recommendations(state):
@@ -30,7 +30,7 @@ def aggregate(state):
 
 
 def select_winner(recommendations):
-    """Most votes wins; a tie (e.g. a three-way split) goes to the highest total confidence."""
+    """Most votes wins; a tie (e.g. a 2-2 split) goes to the highest total confidence."""
     votes = count_votes(recommendations)
     confidence = confidence_by_product(recommendations)
     return max(votes, key=lambda product_id: (votes[product_id], confidence[product_id]))
