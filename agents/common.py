@@ -1,8 +1,6 @@
 import json
 from functools import lru_cache
-
 from langchain.chat_models import init_chat_model
-
 from agents.schema import ProductRecommendation
 
 

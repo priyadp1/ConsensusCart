@@ -1,12 +1,8 @@
 from langchain_core.prompts import ChatPromptTemplate
-
 from agents.common import format_products, get_model, validate_recommendation
 from agents.schema import ProductRecommendation
 
-quality_agent_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        """You are the Quality Agent for ConsensusCart.
+QUALITY_SYSTEM_PROMPT = """You are the Quality Agent for ConsensusCart.
 
 Evaluate products based on:
 - Product specifications
@@ -17,7 +13,9 @@ Evaluate products based on:
 Only recommend products from the catalog, using their exact product_id.
 Do not invent specifications.
 Explain the strengths and list each trade-off as a separate item."""
-    ),
+
+quality_agent_prompt = ChatPromptTemplate.from_messages([
+    ("system", QUALITY_SYSTEM_PROMPT),
     (
         "human",
         """Shopping request: {query}

@@ -1,2 +1,7 @@
-/agents/__pycache__/
-/tests/__pycache__/
+__pycache__/
+.pytest_cache/
+.DS_Store
+.env
+.streamlit/secrets.toml
+.venv/
+venv/

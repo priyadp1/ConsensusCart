@@ -1,4 +1,5 @@
-from typing import TypedDict
+import operator
+from typing import Annotated, TypedDict
 
 
 class ConsensusState(TypedDict, total=False):
@@ -11,7 +12,14 @@ class ConsensusState(TypedDict, total=False):
     # Set by the budget filter: products with price <= budget
     eligible_products: list[dict]
 
-    # Round 0: each agent writes its own key, so the nodes can run in parallel
+    # Each agent writes its own key, so the nodes can run in parallel.
+    # Round 0 sets them; every deliberation round overwrites them.
     budget_recommendation: dict
     quality_recommendation: dict
     trust_recommendation: dict
+
+    # One entry per round, appended by the aggregate node (round 0 = independent)
+    rounds: Annotated[list[dict], operator.add]
+
+    # Set by the finalize node
+    consensus: dict

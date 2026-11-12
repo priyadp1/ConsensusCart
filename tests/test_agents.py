@@ -1,11 +1,11 @@
 import pytest
 from langchain_core.runnables import RunnableLambda
-
 import agents.budget_agent as budget_agent
 import agents.quality_agent as quality_agent
 import agents.trust_agent as trust_agent
 from agents.orchestrator import consensus_graph, filter_by_budget
-from agents.schema import ProductRecommendation
+import consensus.deliberation as deliberation
+from agents.schema import DeliberationResponse
 
 PRODUCTS = [
     {"product_id": "A", "name": "Premium Headphones", "price": 299.0},
@@ -22,12 +22,16 @@ class FakeModel:
     def with_structured_output(self, schema):
         def respond(prompt):
             self.prompts.append(prompt.to_string())
-            return ProductRecommendation(
-                product_id=self.product_id,
-                confidence=0.8,
-                reasoning="Fits the request.",
-                tradeoffs=["Shorter warranty", "Fewer reviews"],
-            )
+            fields = {
+                "product_id": self.product_id,
+                "confidence": 0.8,
+                "reasoning": "Fits the request.",
+                "tradeoffs": ["Shorter warranty", "Fewer reviews"],
+            }
+            # Deliberation nodes ask for DeliberationResponse, which needs an extra field
+            if issubclass(schema, DeliberationResponse):
+                fields["response_to_others"] = "Considered the other agents."
+            return schema(**fields)
 
         return RunnableLambda(respond)
 
@@ -35,7 +39,7 @@ class FakeModel:
 @pytest.fixture
 def fake_model(monkeypatch):
     model = FakeModel()
-    for module in (budget_agent, quality_agent, trust_agent):
+    for module in (budget_agent, quality_agent, trust_agent, deliberation):
         monkeypatch.setattr(module, "get_model", lambda: model)
     return model
 

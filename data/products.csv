@@ -1,0 +1,19 @@
+product_id,name,category,brand,price,rating,review_count,seller,seller_rating,warranty_months,return_window_days,features,description
+HP-01,Auralis Studio ANC Pro,Headphones,Auralis,299.00,4.7,3820,Auralis Official Store,4.9,24,30,Active noise cancelling; 30h battery; LDAC hi-res codec; Multipoint Bluetooth,Flagship over-ear headphones tuned for studio-accurate sound.
+HP-02,Tempo Wave 2,Headphones,Tempo,149.00,4.3,1210,SoundHub Outlet,4.4,12,30,Active noise cancelling; 40h battery; USB-C fast charge,Mid-range over-ear headphones with long battery life.
+HP-03,Brightline Commute,Headphones,Brightline,89.00,4.1,5600,Brightline Direct,4.6,12,14,60h battery; Foldable design; No noise cancelling,Lightweight on-ear headphones built for all-day battery.
+HP-04,Nordvik Quiet 700,Headphones,Nordvik,189.00,4.6,940,Nordvik,4.8,24,60,Hybrid active noise cancelling; 35h battery; aptX Adaptive; Multipoint Bluetooth,Premium-feel noise cancelling headphones with a 60-day return window.
+HP-05,EchoLab ProSonic X,Headphones,EchoLab,179.00,4.8,37,DealZone Marketplace,3.6,,7,Active noise cancelling; 50h battery; Spatial audio,Feature-packed headphones from a third-party marketplace seller.
+HP-06,Pulse Sport Buds,Headphones,Pulse,59.00,4.0,2200,Pulse Audio,4.5,6,30,IPX7 waterproof; 8h battery (32h with case); In-ear earbuds,Sweat-proof earbuds for workouts and running.
+LT-01,Kestrel Book 14 Air,Laptops,Kestrel,899.00,4.6,2140,Kestrel Store,4.8,12,30,14-inch 2.8K display; 16GB RAM; 512GB SSD; 18h battery; 1.2kg,Thin and light everyday laptop with excellent battery life.
+LT-02,Vantage Pro 16,Laptops,Vantage,1599.00,4.7,860,Vantage Direct,4.7,24,30,16-inch 120Hz display; 32GB RAM; 1TB SSD; RTX 4060 GPU; 2.1kg,Performance laptop for creative work and gaming.
+LT-03,Lumen Chromebook Plus,Laptops,Lumen,399.00,4.2,3300,Lumen Official,4.5,12,30,14-inch FHD display; 8GB RAM; 128GB storage; 10h battery; ChromeOS,Affordable laptop for browsing and schoolwork.
+LT-04,Orbit Creator 15,Laptops,Orbit,1249.00,4.9,22,TechBargains Marketplace,3.4,,,15.6-inch OLED display; 32GB RAM; 1TB SSD; RTX 4050 GPU,High-spec creator laptop listed by a marketplace seller.
+LT-05,Kestrel Book 13 Student,Laptops,Kestrel,649.00,4.4,1780,Kestrel Store,4.8,12,30,13-inch FHD display; 8GB RAM; 256GB SSD; 14h battery; 1.1kg,Budget-friendly student laptop from a trusted brand.
+LT-06,Ironclad Workstation 14,Laptops,Ironclad,1099.00,4.5,510,Ironclad Business,4.9,36,30,14-inch FHD display; 16GB RAM; 512GB SSD; MIL-STD durability; 3-year on-site warranty,Rugged business laptop with long warranty coverage.
+CM-01,Barista Duo Espresso,Coffee Makers,Barista Co,449.00,4.6,1450,Barista Co Official,4.8,24,30,15-bar pump; Built-in burr grinder; Steam wand; Dual boiler,Semi-automatic espresso machine with integrated grinder.
+CM-02,DripMaster 12-Cup,Coffee Makers,DripMaster,79.00,4.3,8900,HomeGoods Direct,4.6,12,30,12-cup carafe; Programmable timer; Auto shut-off,Reliable drip coffee maker for families.
+CM-03,PourCraft Precision Brewer,Coffee Makers,PourCraft,159.00,4.7,640,PourCraft,4.7,24,45,SCA-certified temperature; Pre-infusion; Thermal carafe,Specialty drip brewer that mimics pour-over brewing.
+CM-04,Moka Smart Grind & Brew,Coffee Makers,Moka,249.00,4.1,410,Moka Home,4.2,12,30,Built-in grinder; App control; 10-cup carafe,Connected grind-and-brew machine with scheduling.
+CM-05,Cafe Express Pod Machine,Coffee Makers,Cafe Express,119.00,4.4,12500,Cafe Express Store,4.7,12,30,Single-serve pods; 40-second heat-up; Milk frother,Fast single-serve pod coffee machine.
+CM-06,Artisan Lever Pro,Coffee Makers,Artisan,699.00,4.9,18,ImportDirect Marketplace,3.8,,,Manual lever espresso; Pressure gauge; Copper boiler,Hand-built manual espresso machine from an importer.

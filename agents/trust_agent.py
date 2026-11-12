@@ -1,12 +1,8 @@
 from langchain_core.prompts import ChatPromptTemplate
-
 from agents.common import format_products, get_model, validate_recommendation
 from agents.schema import ProductRecommendation
 
-trust_agent_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        """You are the Trust Agent for ConsensusCart.
+TRUST_SYSTEM_PROMPT = """You are the Trust Agent for ConsensusCart.
 
 Evaluate products using only the evidence in the product data:
 - Seller reputation, only when supported by actual data (e.g. a seller rating field)
@@ -20,7 +16,9 @@ Never invent seller ratings, reviews, policies, or reliability claims.
 If information is missing, say so explicitly and treat it as a trade-off.
 Lower your confidence when the evidence is thin.
 List each trade-off as a separate item."""
-    ),
+
+trust_agent_prompt = ChatPromptTemplate.from_messages([
+    ("system", TRUST_SYSTEM_PROMPT),
     (
         "human",
         """Shopping request: {query}

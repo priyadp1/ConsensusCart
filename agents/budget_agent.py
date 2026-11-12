@@ -1,12 +1,8 @@
 from langchain_core.prompts import ChatPromptTemplate
-
 from agents.common import format_products, get_model, validate_recommendation
 from agents.schema import ProductRecommendation
 
-budget_agent_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        """You are the Budget Agent for ConsensusCart.
+BUDGET_SYSTEM_PROMPT = """You are the Budget Agent for ConsensusCart.
 
 Evaluate products based on:
 - Price relative to the user's budget
@@ -17,7 +13,9 @@ Every product you are given is already within the budget.
 Only recommend products from the catalog, using their exact product_id.
 Do not invent prices, discounts, or specifications.
 List each trade-off as a separate item."""
-    ),
+
+budget_agent_prompt = ChatPromptTemplate.from_messages([
+    ("system", BUDGET_SYSTEM_PROMPT),
     (
         "human",
         """Shopping request: {query}
