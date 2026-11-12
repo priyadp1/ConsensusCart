@@ -10,8 +10,9 @@ APP_PATH = str(Path(__file__).parent.parent / "app.py")
 @pytest.fixture(autouse=True)
 def env(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    monkeypatch.delenv("PAYPAL_CLIENT_ID", raising=False)
-    monkeypatch.delenv("PAYPAL_CLIENT_SECRET", raising=False)
+    # Empty rather than deleted, so load_dotenv() can't fill them in from a real .env
+    monkeypatch.setenv("PAYPAL_CLIENT_ID", "")
+    monkeypatch.setenv("PAYPAL_CLIENT_SECRET", "")
 
 
 def search(category="Headphones", budget=200):
@@ -45,6 +46,17 @@ def test_agent_that_changes_its_mind_is_flagged(scripted):
     assert not at.exception
     assert "Changed its mind" in page_text(at)
     assert at.metric[0].value == "100%"
+
+
+def test_changing_the_search_hides_old_results(scripted):
+    scripted({"budget": ["HP-04"], "quality": ["HP-04"], "trust": ["HP-04"]})
+    at = search()
+    assert "Nordvik Quiet 700" in page_text(at)
+    at.selectbox[0].set_value("Coffee Makers")
+    at.run()
+    assert not at.exception
+    assert "Nordvik Quiet 700" not in page_text(at)
+    assert "Your search changed" in at.info[0].value
 
 
 def test_no_products_in_budget_shows_error(scripted):

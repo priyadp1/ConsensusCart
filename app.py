@@ -199,13 +199,20 @@ if "receipt" in st.session_state:
     render_receipt(st.session_state["receipt"])
     st.stop()
 
-with st.form("search"):
-    category = st.selectbox("Category", categories())
-    query = st.text_input("What are you shopping for?", placeholder=EXAMPLE_QUERIES.get(category, ""))
-    left, right = st.columns(2)
-    budget = left.number_input("Maximum budget ($)", min_value=1, value=200, step=10)
-    preferences = right.text_input("Preferences (optional)", placeholder="e.g. battery life over sound quality")
-    submitted = st.form_submit_button("Find Best Products", type="primary")
+# Not an st.form: every edit reruns the page, so results from an older search can be hidden right away
+category = st.selectbox("Category", categories())
+query = st.text_input("What are you shopping for?", placeholder=EXAMPLE_QUERIES.get(category, ""))
+left, right = st.columns(2)
+budget = left.number_input("Maximum budget ($)", min_value=1, value=200, step=10)
+preferences = right.text_input("Preferences (optional)", placeholder="e.g. battery life over sound quality")
+submitted = st.button("Find Best Products", type="primary")
+
+search = {
+    "category": category,
+    "query": query.strip() or EXAMPLE_QUERIES.get(category, category),
+    "budget": float(budget),
+    "preferences": preferences.strip(),
+}
 
 if submitted:
     st.session_state.pop("order", None)
@@ -213,13 +220,13 @@ if submitted:
         st.error("OPENAI_API_KEY is not set. Add it to your environment or a .env file.")
         st.stop()
     state = {
-        "query": query.strip() or EXAMPLE_QUERIES.get(category, category),
-        "budget": float(budget),
-        "preferences": preferences.strip(),
+        "query": search["query"],
+        "budget": search["budget"],
+        "preferences": search["preferences"],
         "products": load_products(category),
     }
     try:
-        st.session_state["result"] = run_consensus(state)
+        st.session_state["result"] = {**run_consensus(state), "search": search}
     except ValueError as error:
         st.session_state.pop("result", None)
         st.error(str(error))
@@ -227,6 +234,10 @@ if submitted:
         st.session_state.pop("result", None)
         st.error(f"The agents could not finish: {error}")
 
-if result := st.session_state.get("result"):
+result = st.session_state.get("result")
+if result and result["search"] != search:
+    st.info("Your search changed. Click **Find Best Products** to get new recommendations.")
+elif result:
+    st.caption(f"Results for “{search['query']}” in {search['category']}, up to ${search['budget']:,.0f}")
     render_consensus(result)
     render_checkout(result["consensus"]["product"])
