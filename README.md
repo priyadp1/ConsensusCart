@@ -2,7 +2,8 @@
 
 **Three AI shopping agents debate until they agree, then you check out with PayPal.**
 
-**▶ Live demo: https://consensuscart.streamlit.app/**. Pay with a PayPal **Sandbox** buyer account (no real money).
+**▶ Live App: https://consensuscart.streamlit.app/**. Pay with a PayPal **Sandbox** buyer account (no real money).
+**▶ Demo Video: https://www.youtube.com/watch?v=xKd2WZkQU1s/**
 
 Shopping assistants usually optimize one thing. ConsensusCart gives the decision to three agents with
 competing priorities and makes them reach consensus in the open:
