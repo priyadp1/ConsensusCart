@@ -5,6 +5,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+def load_streamlit_secrets():
+    """On Streamlit Cloud the keys live in st.secrets; copy them into the environment the agents read."""
+    try:
+        secrets = dict(st.secrets)
+    except Exception:  # no secrets.toml locally
+        return
+    for key, value in secrets.items():
+        values = dict(value) if hasattr(value, "items") else {key: value}  # also accept a [section] table
+        for name, setting in values.items():
+            if isinstance(setting, str) and setting.strip() and not os.getenv(name):
+                os.environ[name] = setting.strip()
+
+
+load_streamlit_secrets()
+
 from agents.orchestrator import consensus_graph  # noqa: E402  (needs the .env loaded first)
 from data.catalog import categories, get_product, load_products  # noqa: E402
 from payments import paypal  # noqa: E402
